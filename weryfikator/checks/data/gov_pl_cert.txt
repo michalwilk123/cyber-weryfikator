@@ -1,0 +1,135 @@
+depth=2 C = PL, O = Unizeto Technologies S.A., OU = Certum Certification Authority, CN = Certum Trusted Network CA
+verify return:1
+depth=1 C = PL, O = Unizeto Technologies S.A., OU = Certum Certification Authority, CN = Certum Extended Validation CA SHA2
+verify return:1
+depth=0 businessCategory = Government Entity, jurisdictionC = PL, serialNumber = 525189465, C = PL, ST = mazowieckie, L = Warszawa, postalCode = 00-060, street = Kr\C3\B3lewska 27, O = Ministerstwo Cyfryzacji, CN = gov.pl
+verify return:1
+CONNECTED(00000005)
+---
+Certificate chain
+ 0 s:businessCategory = Government Entity, jurisdictionC = PL, serialNumber = 525189465, C = PL, ST = mazowieckie, L = Warszawa, postalCode = 00-060, street = Kr\C3\B3lewska 27, O = Ministerstwo Cyfryzacji, CN = gov.pl
+   i:C = PL, O = Unizeto Technologies S.A., OU = Certum Certification Authority, CN = Certum Extended Validation CA SHA2
+   a:PKEY: rsaEncryption, 2048 (bit); sigalg: RSA-SHA256
+   v:NotBefore: Jan  8 14:12:20 2025 GMT; NotAfter: Jan  8 14:12:19 2026 GMT
+-----BEGIN CERTIFICATE-----
+MIIHIjCCBgqgAwIBAgIQAo/R60wzliBv+I3nXzM9QzANBgkqhkiG9w0BAQsFADCB
+hzELMAkGA1UEBhMCUEwxIjAgBgNVBAoTGVVuaXpldG8gVGVjaG5vbG9naWVzIFMu
+QS4xJzAlBgNVBAsTHkNlcnR1bSBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTErMCkG
+A1UEAxMiQ2VydHVtIEV4dGVuZGVkIFZhbGlkYXRpb24gQ0EgU0hBMjAeFw0yNTAx
+MDgxNDEyMjBaFw0yNjAxMDgxNDEyMTlaMIHXMRowGAYDVQQPExFHb3Zlcm5tZW50
+IEVudGl0eTETMBEGCysGAQQBgjc8AgEDEwJQTDESMBAGA1UEBRMJNTI1MTg5NDY1
+MQswCQYDVQQGEwJQTDEUMBIGA1UECAwLbWF6b3dpZWNraWUxETAPBgNVBAcMCFdh
+cnN6YXdhMQ8wDQYDVQQREwYwMC0wNjAxFjAUBgNVBAkMDUtyw7NsZXdza2EgMjcx
+IDAeBgNVBAoMF01pbmlzdGVyc3R3byBDeWZyeXphY2ppMQ8wDQYDVQQDDAZnb3Yu
+cGwwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDuXFyBTp9vbpR+qeCV
+V+Ew5dpa8zg7EHb1WH5Q+TpY8ULs1ZNcQhhEhkZSsj7ujjljHFxTsZXAN5GcQsTy
+ZuwZCxxGj9aSvuSbYfi9GGXPOUXYLraRK9dGeCx4UnRyz/zBWZpbT9zyMUWSJgLS
+mNrfyL0NgVKl6ZmL+v0xQUATqfewig3vEsGV9Hw0NjPFdmLggEHZOZS4YtZRczwm
+LCmd4y2J68dGw9WA1c9FCJcTBBE+4bq/WBj9B7wy/Mc2FiPzYd/iIjS7AW6ubUws
+4ycTqRtOS8L6qmMAoHDlwxM2rANlcQnKc3bPJGOgVp67vFoZQ05s+t5ZMEm32GPw
+cOJ5AgMBAAGjggM2MIIDMjAMBgNVHRMBAf8EAjAAMDIGA1UdHwQrMCkwJ6AloCOG
+IWh0dHA6Ly9jcmwuY2VydHVtLnBsL2V2Y2FzaGEyLmNybDBxBggrBgEFBQcBAQRl
+MGMwKwYIKwYBBQUHMAGGH2h0dHA6Ly9ldmNhc2hhMi5vY3NwLWNlcnR1bS5jb20w
+NAYIKwYBBQUHMAKGKGh0dHA6Ly9yZXBvc2l0b3J5LmNlcnR1bS5wbC9ldmNhc2hh
+Mi5jZXIwHwYDVR0jBBgwFoAUufIi0SCS9aXhE3Wu4Hb4yfGtc48wHQYDVR0OBBYE
+FOpWYMK0AVlUKV8irBkP3jJv23UVMB0GA1UdEgQWMBSBEmV2Y2FzaGEyQGNlcnR1
+bS5wbDBKBgNVHSAEQzBBMAcGBWeBDAEBMDYGCyqEaAGG9ncCBQEBMCcwJQYIKwYB
+BQUHAgEWGWh0dHBzOi8vd3d3LmNlcnR1bS5wbC9DUFMwHQYDVR0lBBYwFAYIKwYB
+BQUHAwEGCCsGAQUFBwMCMA4GA1UdDwEB/wQEAwIFoDAdBgNVHREEFjAUggZnb3Yu
+cGyCCnd3dy5nb3YucGwwggGABgorBgEEAdZ5AgQCBIIBcASCAWwBagB3AA5XlLzz
+rqk+MxssmQez95Dfm8I9cTIl3SGpJaxhxU4hAAABlEZCWykAAAQDAEgwRgIhAP1M
+eDMBxiEKiAIuAU4Uf7PSuzuhWKSPYXcuyWshrW6wAiEA7JBg0jF3UrGCBH6cm3Ci
+90SuD6lgqPwPxxx5WmGx+7cAdwBkEcRspBLsp4kcogIuALyrTygH1B41J6vq/tUD
+yX3N8AAAAZRGQlslAAAEAwBIMEYCIQC517oK/IWqG5e6Vokngje8M+x/HopFHL+b
+iipbk/MnmAIhAMkpC1c0VPs2jvS0JuL8xlInRFpHQS9FHUF3mjdHfYPKAHYAGYbU
+xyiqb/66A294Kk0BkarOLXIxD67OXXBBLSVMx9QAAAGURkJcPAAABAMARzBFAiAq
+/6cIso3DkL/UtfnzOkWYqmYKOr57j4TaOVxY8UtFmQIhAM5r9jG9/s+R45V48SL9
+HRhsstxK/Dclxg8AHIg2wri2MA0GCSqGSIb3DQEBCwUAA4IBAQCXaEIMUXxwCzIY
+r/pObPIt02aQ6ITXgmR0psOUeunBXhtpgPvfnLn1pqhrCfNa2LQckDgBmITMBJtR
+OWQwq8dpBmu9TebJdOtI9sYxC+PhXRlWoAugfyBy726phjAId/qJ3yd1cpSfqygC
+OLZaYmBs5dA1XVf55Ov1iuLn9l7pEIKbD4YAYpXjETWKhB9cxKUbxiMEfaS+3XCO
+tFVrts6uset5S3h+JD4uTB8lY3JBf5A9e9hpOB8dYfxWKSkbxZOcocVZwFrfPCBS
+DZHaLPm+gBfe+8XT6Y2yxcFqjYEIS4poyN5kkkOswuhlS+r8xUr0q+neOZDM7aPr
+FbvcKkUS
+-----END CERTIFICATE-----
+ 1 s:C = PL, O = Unizeto Technologies S.A., OU = Certum Certification Authority, CN = Certum Trusted Network CA
+   i:C = PL, O = Unizeto Technologies S.A., OU = Certum Certification Authority, CN = Certum Trusted Network CA
+   a:PKEY: rsaEncryption, 2048 (bit); sigalg: RSA-SHA1
+   v:NotBefore: Oct 22 12:07:37 2008 GMT; NotAfter: Dec 31 12:07:37 2029 GMT
+-----BEGIN CERTIFICATE-----
+MIIDuzCCAqOgAwIBAgIDBETAMA0GCSqGSIb3DQEBBQUAMH4xCzAJBgNVBAYTAlBM
+MSIwIAYDVQQKExlVbml6ZXRvIFRlY2hub2xvZ2llcyBTLkEuMScwJQYDVQQLEx5D
+ZXJ0dW0gQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkxIjAgBgNVBAMTGUNlcnR1bSBU
+cnVzdGVkIE5ldHdvcmsgQ0EwHhcNMDgxMDIyMTIwNzM3WhcNMjkxMjMxMTIwNzM3
+WjB+MQswCQYDVQQGEwJQTDEiMCAGA1UEChMZVW5pemV0byBUZWNobm9sb2dpZXMg
+Uy5BLjEnMCUGA1UECxMeQ2VydHVtIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MSIw
+IAYDVQQDExlDZXJ0dW0gVHJ1c3RlZCBOZXR3b3JrIENBMIIBIjANBgkqhkiG9w0B
+AQEFAAOCAQ8AMIIBCgKCAQEA4/t9o3K6wvDJFIf1awFO4W5AB7ptJ11/91sts1rH
+UV+rpDKmYYe2bg+G0jACl/jXaVehGDldamR5xgFZrDwxSjh80gTSSyjoIF87B6LM
+TXPb865Px1bVWqeWifrzq2jUI4ZZJ88JJ7ysbnKDHDBy3+Ci6dLhdHUZvSqeexVU
+BBvXQzmtVSjF4hq79MDkrjhJM8x2hZ85RdKknvISjFH4fOQtf/WsX+sWn7Et0brM
+kUJ3TCXJkDhv2/DM+44el1k+1WBO5gUo7Ul5E0u6SNsv+XLTOcr+H9g0cvW0QM8x
+AcPs3hEtF10fuFDRXhmnad4HMyjKUJX5p1TLVIZQRan5SQIDAQABo0IwQDAPBgNV
+HRMBAf8EBTADAQH/MB0GA1UdDgQWBBQIds3LB/8k9sXN7buQvOKEN0Z19zAOBgNV
+HQ8BAf8EBAMCAQYwDQYJKoZIhvcNAQEFBQADggEBAKaorSLOAT2mo/9i0Eidi15y
+sHhE49wcrwn9I0j6vSrEuVUEtRCjjSfeC4Jj0O7eDDd5QVsisrCaQVymcODU0HfL
+I9MA4GxWL+FpDQ3Zqr8hgVDZBqWo/5U30Kr+4rP1mS1FhIrlQgnXdAIv94nYmem8
+J9RHjboNRhx3zxSkHLmkMcScKHQDNP8zGSal6Q10tz6XxnboJ5ajZt3hrvJBW8qY
+VoNzcOSGGtIxQbovvi0TWnZvTuhOgQ4/WwMioBK+ZlgRSssDxLQqKi2WF+A5VLxI
+03YnnZotBqbJ7DnSq9ufmgsnAjUpsUCV5/nonFWIGUbWtzT1fs45mtk48VH3Tyw=
+-----END CERTIFICATE-----
+ 2 s:C = PL, O = Unizeto Technologies S.A., OU = Certum Certification Authority, CN = Certum Extended Validation CA SHA2
+   i:C = PL, O = Unizeto Technologies S.A., OU = Certum Certification Authority, CN = Certum Trusted Network CA
+   a:PKEY: rsaEncryption, 2048 (bit); sigalg: RSA-SHA256
+   v:NotBefore: Sep 11 12:00:00 2014 GMT; NotAfter: Jun  9 10:46:39 2027 GMT
+-----BEGIN CERTIFICATE-----
+MIIE0TCCA7mgAwIBAgIRAMWi0/brTRk8F6kKo4opblQwDQYJKoZIhvcNAQELBQAw
+fjELMAkGA1UEBhMCUEwxIjAgBgNVBAoTGVVuaXpldG8gVGVjaG5vbG9naWVzIFMu
+QS4xJzAlBgNVBAsTHkNlcnR1bSBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTEiMCAG
+A1UEAxMZQ2VydHVtIFRydXN0ZWQgTmV0d29yayBDQTAeFw0xNDA5MTExMjAwMDBa
+Fw0yNzA2MDkxMDQ2MzlaMIGHMQswCQYDVQQGEwJQTDEiMCAGA1UEChMZVW5pemV0
+byBUZWNobm9sb2dpZXMgUy5BLjEnMCUGA1UECxMeQ2VydHVtIENlcnRpZmljYXRp
+b24gQXV0aG9yaXR5MSswKQYDVQQDEyJDZXJ0dW0gRXh0ZW5kZWQgVmFsaWRhdGlv
+biBDQSBTSEEyMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwkjZnegj
+QDnmzVUWTRJjmqhLeUg5+KdA+8O00r5sYK5ZAYXRIaGygJSpI7Xlnc6hVfWebNqk
+Sropm130IDmyQvYLOr7SFFwkyJpwW0M4ibk/rV9UaVEfsTqmiGNl3+dUX7swDeLf
+uUoTqXOF52qxBZf1qMfwFPSvBBxCLRQECnNTTHXtEdF00fYGnikgkceuWJfn/0Pk
+KR7Fo4paMhRtXN1cRKuoMwUaWGRlpZJLztsDUEVpgex1n/PbKI9n/WDif0BceTj0
+Yr7D0DDzybS9GniVW9jI406Zbfi5apOLxKIH/Y5d7tLSxlLhV1Dt/ORa3iF+OzxZ
+9Bj7ox0rbHhzpwIDAQABo4IBPjCCATowDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4E
+FgQUufIi0SCS9aXhE3Wu4Hb4yfGtc48wHwYDVR0jBBgwFoAUCHbNywf/JPbFze27
+kLzihDdGdfcwDgYDVR0PAQH/BAQDAgEGMC8GA1UdHwQoMCYwJKAioCCGHmh0dHA6
+Ly9jcmwuY2VydHVtLnBsL2N0bmNhLmNybDBrBggrBgEFBQcBAQRfMF0wKAYIKwYB
+BQUHMAGGHGh0dHA6Ly9zdWJjYS5vY3NwLWNlcnR1bS5jb20wMQYIKwYBBQUHMAKG
+JWh0dHA6Ly9yZXBvc2l0b3J5LmNlcnR1bS5wbC9jdG5jYS5jZXIwOQYDVR0gBDIw
+MDAuBgRVHSAAMCYwJAYIKwYBBQUHAgEWGGh0dHA6Ly93d3cuY2VydHVtLnBsL0NQ
+UzANBgkqhkiG9w0BAQsFAAOCAQEAUbDCOxFY2JERv02ZR8fmQelc/AzuQtSLs2MO
+b/Mz3l9NU3EdsF+Pd9zTr3MZvnw6+QfD+eTgkjNGpMTXRMxtNZahEACjdYftukcP
+7sTTYlAa3DjR6h2ayCY5+LCpC9y+agNqnn11DJvwD8Tk0jVuGvWjgPii5zlTG1Cy
+CWSLvykZQiTA3ffszzcSEGklT+lftAzTqTiC69Ul7J56gZfmwSiK2jiyMcXDVHyB
+IhWyLCLnD1fA8hYnnSlXKLNKHX0ZLORY585jv1dJ2GHPis42NjE6re+RY+jezTDJ
+VYpsqEvLOEvf08u5xjzZ6HRX8wD561zNWX1uvFR3JDmyb8eW1g==
+-----END CERTIFICATE-----
+---
+Server certificate
+subject=businessCategory = Government Entity, jurisdictionC = PL, serialNumber = 525189465, C = PL, ST = mazowieckie, L = Warszawa, postalCode = 00-060, street = Kr\C3\B3lewska 27, O = Ministerstwo Cyfryzacji, CN = gov.pl
+issuer=C = PL, O = Unizeto Technologies S.A., OU = Certum Certification Authority, CN = Certum Extended Validation CA SHA2
+---
+No client certificate CA names sent
+Peer signing digest: SHA256
+Peer signature type: RSA-PSS
+Server Temp Key: X25519, 253 bits
+---
+SSL handshake has read 4596 bytes and written 392 bytes
+Verification: OK
+---
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Server public key is 2048 bit
+Secure Renegotiation IS NOT supported
+Compression: NONE
+Expansion: NONE
+No ALPN negotiated
+Early data was not sent
+Verify return code: 0 (ok)
+---
+DONE

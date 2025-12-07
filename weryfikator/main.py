@@ -7,6 +7,8 @@ from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from checks.base import BaseCheckError, CertificateError, DomainError, HTTPError, KeyExchangeError
+from checks.ca_chain import check_ca_chain
+from checks.domain import verify_domain
 from checks.unified import check_domain_security
 
 
@@ -107,6 +109,7 @@ async def generate_token(
     - SSL/Certificate validity
     - Key exchange security
     - HTTP security (HTTPS-to-HTTP redirects, HTTP-only sites)
+    - CA chain validation (verifies root CA matches gov.pl)
     """
     # Perform domain security checks if enabled
     if settings.enable_domain_checks:
@@ -118,6 +121,11 @@ async def generate_token(
                     timeout=10,
                     skip_domain_whitelist=False
                 )
+            
+            # Additional checks: Domain whitelist and CA chain validation
+            verify_domain(request.domain)
+            await check_ca_chain(request.domain, timeout=10)
+            
         except DomainError as e:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
