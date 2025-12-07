@@ -29,7 +29,8 @@
         "android.permission.CAMERA",
         "android.permission.INTERNET"
       ],
-      "package": "com.cyberweryfikator.qrscanner"
+      "package": "com.cyberweryfikator.qrscanner",
+      "networkSecurityConfig": "./android-network-security-config.xml"
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -14,16 +14,20 @@ const COLORS = {
 };
 
 // API Configuration
-const API_ENDPOINT = 'http://localhost:8081/verify-token'; // mObywatel service endpoint
+const API_ENDPOINT = 'https://mobyw-hacknation.micwilk.com/verify-token'; // mObywatel service endpoint
 const API_METHOD = 'POST';
 const API_TIMEOUT_MS = 3000; // 3 second timeout
 const HARDCODED_USER_ID = 'user001'; // Hardcoded user ID for authentication
+
+type VerificationStatus = 'idle' | 'success' | 'failed' | 'info';
 
 export default function App() {
   const [permission, requestPermission] = useCameraPermissions();
   const [scannedData, setScannedData] = useState<string>('');
   const [isScanning, setIsScanning] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>('idle');
+  const [verifiedDomain, setVerifiedDomain] = useState<string>('');
 
   useEffect(() => {
     if (permission && !permission.granted && permission.canAskAgain) {
@@ -32,31 +36,96 @@ export default function App() {
   }, [permission]);
 
   const sendToApi = async (qrData: string) => {
+    console.log('=== API Request Starting ===');
+    console.log('QR Data:', qrData);
+    console.log('Endpoint:', API_ENDPOINT);
+    console.log('Method:', API_METHOD);
+    console.log('User ID:', HARDCODED_USER_ID);
+    console.log('Timeout:', API_TIMEOUT_MS, 'ms');
+    
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
 
+      const requestBody = { token: qrData };
+      console.log('Request Body:', JSON.stringify(requestBody));
+
+      console.log('Sending fetch request...');
       const response = await fetch(API_ENDPOINT, {
         method: API_METHOD,
         headers: {
           'Content-Type': 'application/json',
           'X-User-ID': HARDCODED_USER_ID,
         },
-        body: JSON.stringify({ token: qrData }),
+        body: JSON.stringify(requestBody),
         signal: controller.signal,
       });
 
       clearTimeout(timeoutId);
-      const result = await response.json();
-      console.log('API Response:', result);
-      // TODO: Handle API response when backend is ready
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
-        console.error('API Timeout');
-      } else {
-        console.error('API Error:', error);
+      
+      console.log('Response Status:', response.status);
+      console.log('Response Status Text:', response.statusText);
+      console.log('Response OK:', response.ok);
+      console.log('Response Headers:', JSON.stringify(Object.fromEntries(response.headers.entries())));
+      
+      const responseText = await response.text();
+      console.log('Response Text:', responseText);
+      
+      let result;
+      try {
+        result = JSON.parse(responseText);
+        console.log('Parsed Response:', result);
+      } catch (parseError) {
+        console.error('Failed to parse response as JSON:', parseError);
+        console.log('Raw response text:', responseText);
+        setVerificationStatus('failed');
+        setErrorMessage('Błąd parsowania odpowiedzi serwera');
+        return;
       }
-      // TODO: Handle errors when backend is ready
+      
+      if (!response.ok) {
+        console.error('Response not OK. Status:', response.status);
+        setVerificationStatus('failed');
+        setErrorMessage('Błąd serwera');
+        return;
+      }
+      
+      console.log('=== API Request Successful ===');
+      
+      // Handle API response
+      if (result.valid === true) {
+        setVerificationStatus('success');
+        setVerifiedDomain(result.domain || '');
+        setErrorMessage('');
+      } else {
+        setVerificationStatus('failed');
+        setErrorMessage(result.message || 'Weryfikacja nie powiodła się');
+      }
+    } catch (error: any) {
+      console.error('=== API Request Failed ===');
+      
+      if (error.name === 'AbortError') {
+        console.error('Error Type: Timeout');
+        console.error('The request timed out after', API_TIMEOUT_MS, 'ms');
+        setVerificationStatus('failed');
+        setErrorMessage('Przekroczono czas oczekiwania');
+      } else if (error.name === 'TypeError') {
+        console.error('Error Type: Network/CORS Error');
+        console.error('Possible causes:');
+        console.error('- Network connection issue');
+        console.error('- CORS policy blocking the request');
+        console.error('- Invalid URL or server not reachable');
+        setVerificationStatus('failed');
+        setErrorMessage('Błąd połączenia sieciowego');
+      } else {
+        console.error('Error Type:', error.name);
+        setVerificationStatus('failed');
+        setErrorMessage('Nieznany błąd weryfikacji');
+      }
+      
+      console.error('Error Message:', error.message);
+      console.error('Error Object:', error);
+      console.error('Error Stack:', error.stack);
     }
   };
 
@@ -68,16 +137,27 @@ export default function App() {
     setErrorMessage(''); // Clear any previous errors
 
     // Check if QR code has the "verification-code" prefix
-    if (result.data.startsWith('verification-code')) {
-      sendToApi(result.data); // Send to API only if valid
+    if (result.data.startsWith('verification-code:')) {
+      // Extract the base64 token part (after the prefix)
+      const token = result.data.replace('verification-code:', '');
+      sendToApi(token); 
+    } else if (result.data.startsWith('verification-code')) {
+        // Handle case where colon might be missing or different format
+        // This is a fallback/robustness check
+         const token = result.data.replace('verification-code', '');
+         sendToApi(token);
     } else {
-      setErrorMessage('Nieprawidłowy kod QR. Nie można zweryfikować strony');
+      // No verification prefix - show info message
+      setVerificationStatus('info');
+      setErrorMessage('Zeskanuj kod walidacyjny');
     }
   };
 
   const handleContinue = () => {
     setScannedData('');
     setErrorMessage('');
+    setVerificationStatus('idle');
+    setVerifiedDomain('');
     setIsScanning(true); // Resume scanning
   };
 
@@ -168,26 +248,63 @@ export default function App() {
         {/* Result Card */}
         {scannedData ? (
           <View style={styles.card}>
-            {errorMessage ? (
-              // Error message display
-              <>
-                <Text style={styles.errorTitle}>Błąd weryfikacji</Text>
-                <View style={styles.errorBox}>
-                  <Text style={styles.errorText}>
-                    {errorMessage}
-                  </Text>
-                </View>
-                <View style={styles.resultBox}>
-                  <Text style={styles.resultLabel}>Zeskanowany kod:</Text>
-                  <Text style={styles.resultText} selectable>
+            {verificationStatus === 'success' ? (
+              // Success Screen (Green)
+              <View style={styles.successScreen}>
+                <Text style={styles.successTitle}>✓ Strona jest zaufana</Text>
+                <Text style={styles.successNote}>
+                  Upewnij się, że domena to:
+                </Text>
+                <Text style={styles.domainText}>{verifiedDomain}</Text>
+                <Text style={styles.successInstructions}>
+                  Możesz bezpiecznie korzystać z tej strony. Weryfikacja potwierdza autentyczność domeny.
+                </Text>
+                <View style={styles.tokenPreview}>
+                  <Text style={styles.tokenPreviewLabel}>Token:</Text>
+                  <Text style={styles.tokenPreviewText} numberOfLines={2} ellipsizeMode="middle">
                     {scannedData}
                   </Text>
                 </View>
-              </>
+              </View>
+            ) : verificationStatus === 'failed' ? (
+              // Failed Screen (Red)
+              <View style={styles.failedScreen}>
+                <Text style={styles.failedTitle}>⚠️ UWAGA: Strona niezweryfikowana!</Text>
+                <Text style={styles.failedWarning}>
+                  Nie korzystaj z tej strony!
+                </Text>
+                <Text style={styles.failedInstructions}>
+                  Co powinieneś zrobić:{'\n'}
+                  • Natychmiast zamknij stronę{'\n'}
+                  • Nie podawaj żadnych danych osobowych{'\n'}
+                  • Zgłoś podejrzaną stronę{'\n'}
+                  • Skontaktuj się z właściwą instytucją bezpośrednio
+                </Text>
+                <View style={styles.tokenPreview}>
+                  <Text style={styles.tokenPreviewLabel}>Token:</Text>
+                  <Text style={styles.tokenPreviewText} numberOfLines={2} ellipsizeMode="middle">
+                    {scannedData}
+                  </Text>
+                </View>
+              </View>
+            ) : verificationStatus === 'info' ? (
+              // Info Screen (Neutral)
+              <View style={styles.infoScreen}>
+                <Text style={styles.infoTitle}>ℹ️ Zeskanuj kod walidacyjny</Text>
+                <Text style={styles.infoMessage}>
+                  Zeskanowany kod nie jest kodem weryfikacyjnym. Upewnij się, że skanujesz właściwy kod QR z weryfikowanej strony internetowej.
+                </Text>
+                <View style={styles.tokenPreview}>
+                  <Text style={styles.tokenPreviewLabel}>Zeskanowane dane:</Text>
+                  <Text style={styles.tokenPreviewText} numberOfLines={2} ellipsizeMode="middle">
+                    {scannedData}
+                  </Text>
+                </View>
+              </View>
             ) : (
-              // Success display
+              // Default display (when verification is in progress)
               <>
-                <Text style={styles.cardTitle}>Zeskanowane dane</Text>
+                <Text style={styles.cardTitle}>Weryfikacja w toku...</Text>
                 <View style={styles.resultBox}>
                   <Text style={styles.resultText} selectable>
                     {scannedData}
@@ -317,6 +434,126 @@ const styles = StyleSheet.create({
     color: COLORS.TEXT_DARK,
     fontSize: 14,
     lineHeight: 22,
+  },
+  // Success Screen Styles
+  successScreen: {
+    backgroundColor: '#2e7d32',
+    borderRadius: 12,
+    padding: 24,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  successTitle: {
+    color: COLORS.WHITE,
+    fontSize: 24,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  successNote: {
+    color: COLORS.WHITE,
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 8,
+    opacity: 0.95,
+  },
+  domainText: {
+    color: COLORS.WHITE,
+    fontSize: 32,
+    fontWeight: '800',
+    textAlign: 'center',
+    marginBottom: 20,
+    letterSpacing: 1,
+  },
+  successInstructions: {
+    color: COLORS.WHITE,
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 16,
+    lineHeight: 20,
+    opacity: 0.95,
+  },
+  // Failed Screen Styles
+  failedScreen: {
+    backgroundColor: COLORS.GOV_RED,
+    borderRadius: 12,
+    padding: 24,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  failedTitle: {
+    color: COLORS.WHITE,
+    fontSize: 24,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  failedWarning: {
+    color: COLORS.WHITE,
+    fontSize: 20,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  failedMessage: {
+    color: COLORS.WHITE,
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20,
+    opacity: 0.9,
+  },
+  failedInstructions: {
+    color: COLORS.WHITE,
+    fontSize: 14,
+    textAlign: 'left',
+    marginBottom: 16,
+    lineHeight: 22,
+    opacity: 0.95,
+  },
+  // Info Screen Styles
+  infoScreen: {
+    backgroundColor: '#ff9800',
+    borderRadius: 12,
+    padding: 24,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  infoTitle: {
+    color: COLORS.WHITE,
+    fontSize: 22,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  infoMessage: {
+    color: COLORS.WHITE,
+    fontSize: 15,
+    textAlign: 'center',
+    marginBottom: 20,
+    lineHeight: 22,
+    opacity: 0.95,
+  },
+  // Token Preview Styles (small, collapsed)
+  tokenPreview: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 8,
+    padding: 12,
+    width: '100%',
+    marginTop: 8,
+  },
+  tokenPreviewLabel: {
+    color: COLORS.WHITE,
+    fontSize: 11,
+    fontWeight: '600',
+    marginBottom: 4,
+    opacity: 0.9,
+  },
+  tokenPreviewText: {
+    color: COLORS.WHITE,
+    fontSize: 10,
+    opacity: 0.8,
+    fontFamily: 'monospace',
   },
   errorTitle: {
     color: COLORS.GOV_RED,
