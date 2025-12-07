@@ -1,0 +1,63 @@
+services:
+  # Bank service - publicly accessible on port 8080
+  bank:
+    build: ./bank
+    image: cyber-weryfikator-bank
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./bank:/app
+      - /app/.venv  # Preserve virtualenv from build
+    networks:
+      - public_net
+      - internal_net
+    environment:
+      - WERYFIKATOR_URL=http://weryfikator-service:8888
+      - DOMAIN=bank.pl
+    restart: unless-stopped
+    container_name: bank-service
+
+  # mObywatel (mobile app backend) - publicly accessible on port 8081
+  mObywatel:
+    build: ./mObywatel
+    image: cyber-weryfikator-mobywatel
+    ports:
+      - "8081:9090"
+    volumes:
+      - ./mObywatel:/app
+      - /app/.venv  # Preserve virtualenv from build
+    networks:
+      - public_net
+      - internal_net
+    environment:
+      - WERYFIKATOR_URL=http://weryfikator-service:8888
+    restart: unless-stopped
+    container_name: mobywatel-service
+
+  # Weryfikator (verification service) - internal only, no host port mapping
+  weryfikator:
+    build: ./weryfikator
+    image: cyber-weryfikator-weryfikator
+    # NO ports mapping to host - internal only
+    volumes:
+      - ./weryfikator:/app
+      - /app/.venv  # Preserve virtualenv from build
+    networks:
+      - internal_net
+    environment:
+      - MASTER_SECRET=super_secret_master_key_2025
+      - DEFAULT_TTL_SECONDS=30
+    restart: unless-stopped
+    container_name: weryfikator-service
+
+networks:
+  # Public network for services exposed to the host
+  public_net:
+    driver: bridge
+  
+  # Internal network for inter-service communication
+  # Weryfikator is ONLY on this network, making it inaccessible from host
+  internal_net:
+    driver: bridge
+    internal: false  # Allow outbound connections but no direct host access to weryfikator
+

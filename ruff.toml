@@ -1,0 +1,14 @@
+line-length = 100
+target-version = "py312"
+
+[lint]
+select = ["E", "F", "I"]
+
+[lint.isort]
+force-sort-within-sections = true
+split-on-trailing-comma = true
+
+[format]
+quote-style = "single"
+indent-style = "space"
+

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank.pl - Bezpieczne logowanie</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .logo-subtitle {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: normal;
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav a:hover {
+            color: #667eea;
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 900px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            overflow: hidden;
+        }
+
+        /* Left side - Login form */
+        .login-section {
+            padding: 3rem;
+        }
+
+        .login-title {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 0.9rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .forgot-password a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        /* Right side - QR Verification */
+        .verification-section {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .verification-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .verification-header h2 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .verification-header p {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        #qr-verification {
+            margin: 1rem 0;
+        }
+
+        .security-info {
+            background: rgba(255, 255, 255, 0.7);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .security-info strong {
+            color: #333;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .login-card {
+                grid-template-columns: 1fr;
+            }
+
+            .verification-section {
+                border-top: 1px solid #ddd;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+        }
+
+        /* Security badge */
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(76, 175, 80, 0.1);
+            color: #2e7d32;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .security-badge::before {
+            content: "🔒";
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            Bank.pl
+            <div class="logo-subtitle">Twój bezpieczny partner finansowy</div>
+        </div>
+        <nav class="nav">
+            <a href="#">Produkty</a>
+            <a href="#">Usługi</a>
+            <a href="#">Kontakt</a>
+            <a href="#">Pomoc</a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <div class="login-card">
+            <!-- Login Form Section -->
+            <div class="login-section">
+                <h1 class="login-title">Witaj ponownie!</h1>
+                <p class="login-subtitle">Zaloguj się do swojego konta bankowego</p>
+
+                <form onsubmit="return false;">
+                    <div class="form-group">
+                        <label for="username">Identyfikator klienta</label>
+                        <input type="text" id="username" name="username" placeholder="Wprowadź swój identyfikator" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Hasło</label>
+                        <input type="password" id="password" name="password" placeholder="Wprowadź hasło" required>
+                    </div>
+
+                    <button type="submit" class="login-button">Zaloguj się</button>
+
+                    <div class="forgot-password">
+                        <a href="#">Zapomniałeś hasła?</a>
+                    </div>
+                </form>
+
+                <div class="security-badge">
+                    Połączenie zabezpieczone SSL
+                </div>
+            </div>
+
+            <!-- QR Verification Section -->
+            <div class="verification-section">
+                <div class="verification-header">
+                    <h2>Weryfikacja bezpieczeństwa</h2>
+                    <p>Zeskanuj kod QR aplikacją mObywatel, aby zweryfikować autentyczność tej strony</p>
+                </div>
+
+                <!-- QR Component will be injected here -->
+                <div id="qr-verification"></div>
+
+                <div class="security-info">
+                    <strong>Dlaczego to jest ważne?</strong><br>
+                    Kod QR potwierdza, że jesteś na prawdziwej stronie Bank.pl. 
+                    Nigdy nie loguj się na stronie, której nie możesz zweryfikować.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2024 Bank.pl - Wszystkie prawa zastrzeżone | <a href="#">Polityka prywatności</a> | <a href="#">Regulamin</a></p>
+    </footer>
+
+    <!-- Embed the QR Component -->
+    <script src="/static/qr-component.js"></script>
+</body>
+</html>
+
