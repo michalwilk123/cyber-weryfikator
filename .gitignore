@@ -5,6 +5,7 @@ build/
 dist/
 wheels/
 *.egg-info
+bank/secret.txt
 
 # Virtual environments
 .venv

@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 
 from connector import close_connector, get_connector
 from fastapi import Depends, FastAPI, Header, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 import httpx
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -60,6 +61,15 @@ app = FastAPI(
     description='Mobile application backend service',
     version='1.0.0',
     lifespan=lifespan,
+)
+
+# Add CORS middleware to allow requests from mobile app
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins for mobile app
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 

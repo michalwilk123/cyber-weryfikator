@@ -1,9 +1,13 @@
 from functools import lru_cache
 
+import aiohttp
 from crypto import Verifier
 from fastapi import Depends, FastAPI, HTTPException, status
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from checks.base import BaseCheckError, CertificateError, DomainError, HTTPError, KeyExchangeError
+from checks.unified import check_domain_security
 
 
 class Settings(BaseSettings):
@@ -12,6 +16,9 @@ class Settings(BaseSettings):
     master_secret: str = Field(..., description='Master secret for HMAC signing')
     default_ttl_seconds: int = Field(
         ..., description='Default time-to-live for tokens in seconds', ge=1
+    )
+    enable_domain_checks: bool = Field(
+        default=False, description='Enable domain security checks before token generation'
     )
 
     model_config = SettingsConfigDict(
@@ -94,7 +101,49 @@ async def generate_token(
     - Time-to-live (TTL)
     - Random salt (128-bit)
     - HMAC-SHA256 signature (using master secret + pepper)
+    
+    When ENABLE_DOMAIN_CHECKS is set, performs security checks:
+    - Domain whitelist validation
+    - SSL/Certificate validity
+    - Key exchange security
+    - HTTP security (HTTPS-to-HTTP redirects, HTTP-only sites)
     """
+    # Perform domain security checks if enabled
+    if settings.enable_domain_checks:
+        try:
+            async with aiohttp.ClientSession() as session:
+                await check_domain_security(
+                    session=session,
+                    domain=request.domain,
+                    timeout=10,
+                    skip_domain_whitelist=False
+                )
+        except DomainError as e:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Domain not allowed: {e.message}"
+            )
+        except CertificateError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"SSL/Certificate error: {e.message}"
+            )
+        except KeyExchangeError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Key exchange error: {e.message}"
+            )
+        except HTTPError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"HTTP security error: {e.message}"
+            )
+        except BaseCheckError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Security check failed: {e.message}"
+            )
+    
     ttl = request.ttl_seconds if request.ttl_seconds is not None else settings.default_ttl_seconds
     token = verifier.generate_token(domain=request.domain, ttl_seconds=ttl)
 

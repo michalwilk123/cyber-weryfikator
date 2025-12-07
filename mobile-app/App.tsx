@@ -13,10 +13,11 @@ const COLORS = {
   TEXT_GRAY: '#666666',
 };
 
-// API Configuration - change endpoint when backend is ready
-const API_ENDPOINT = 'https://api.example.com/verify'; // TODO: Update this URL
-const API_METHOD = 'POST'; // TODO: Change if needed
+// API Configuration
+const API_ENDPOINT = 'http://localhost:8081/verify-token'; // mObywatel service endpoint
+const API_METHOD = 'POST';
 const API_TIMEOUT_MS = 3000; // 3 second timeout
+const HARDCODED_USER_ID = 'user001'; // Hardcoded user ID for authentication
 
 export default function App() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -39,8 +40,9 @@ export default function App() {
         method: API_METHOD,
         headers: {
           'Content-Type': 'application/json',
+          'X-User-ID': HARDCODED_USER_ID,
         },
-        body: JSON.stringify({ qrData }),
+        body: JSON.stringify({ token: qrData }),
         signal: controller.signal,
       });
 

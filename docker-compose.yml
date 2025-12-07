@@ -47,6 +47,7 @@ services:
     environment:
       - MASTER_SECRET=super_secret_master_key_2025
       - DEFAULT_TTL_SECONDS=30
+      - ENABLE_DOMAIN_CHECKS=false
     restart: unless-stopped
     container_name: weryfikator-service
 
