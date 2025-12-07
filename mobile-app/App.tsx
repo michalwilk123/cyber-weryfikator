@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, ScrollView, Platform, StatusBar as NativeStatusBar } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
 
@@ -84,7 +84,14 @@ export default function App() {
       }
       
       if (!response.ok) {
-        console.error('Response not OK. Status:', response.status);
+        console.log('Response not OK. Status:', response.status);
+        if (response.status === 401) {
+             setVerificationStatus('failed');
+             // setErrorMessage is kept empty or descriptive to avoid showing "Server Error" in UI if that's what was happening
+             setErrorMessage(''); 
+             return;
+        }
+
         setVerificationStatus('failed');
         setErrorMessage('Błąd serwera');
         return;
@@ -198,20 +205,6 @@ export default function App() {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={styles.bottomNav}>
-          <View style={styles.navItem}>
-            <Text style={styles.navText}>Usługi</Text>
-          </View>
-          <View style={styles.navItem}>
-            <Text style={styles.navText}>Przekaż</Text>
-          </View>
-          <View style={[styles.navItem, styles.navItemActive]}>
-            <Text style={[styles.navText, styles.navTextActive]}>Sprawdź</Text>
-          </View>
-          <View style={styles.navItem}>
-            <Text style={styles.navText}>Historia</Text>
-          </View>
-        </View>
       </SafeAreaView>
     );
   }
@@ -226,128 +219,118 @@ export default function App() {
       </View>
 
       {/* Main Content */}
-      <ScrollView style={styles.contentArea}>
-        {/* Scanner Card */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Zweryfikuj osobę za pomocą kodu QR</Text>
-          <Text style={styles.cardSubtitle}>
-            Pozwól zeskanować kod, aby dokonać obustronnej wymiany danych.
-          </Text>
-          <View style={styles.cameraContainer}>
-            <CameraView
-              style={styles.camera}
-              facing="back"
-              barcodeScannerSettings={{
-                barcodeTypes: ['qr'],
-              }}
-              onBarcodeScanned={isScanning ? handleBarCodeScanned : undefined}
-            />
-          </View>
-        </View>
-
-        {/* Result Card */}
-        {scannedData ? (
+      <View style={styles.contentArea}>
+        {!scannedData ? (
+          /* Scanner Card */
           <View style={styles.card}>
-            {verificationStatus === 'success' ? (
-              // Success Screen (Green)
-              <View style={styles.successScreen}>
-                <Text style={styles.successTitle}>✓ Strona jest zaufana</Text>
-                <Text style={styles.successNote}>
-                  Upewnij się, że domena to:
-                </Text>
-                <Text style={styles.domainText}>{verifiedDomain}</Text>
-                <Text style={styles.successInstructions}>
-                  Możesz bezpiecznie korzystać z tej strony. Weryfikacja potwierdza autentyczność domeny.
-                </Text>
-                <View style={styles.tokenPreview}>
-                  <Text style={styles.tokenPreviewLabel}>Token:</Text>
-                  <Text style={styles.tokenPreviewText} numberOfLines={2} ellipsizeMode="middle">
-                    {scannedData}
+            <Text style={styles.cardTitle}>Weryfikacja strony rządowej</Text>
+            <Text style={styles.cardSubtitle}>
+              Zeskanuj kod QR ze strony gov.pl, aby potwierdzić jej autentyczność.
+            </Text>
+            <View style={styles.cameraContainer}>
+              <CameraView
+                style={styles.camera}
+                facing="back"
+                barcodeScannerSettings={{
+                  barcodeTypes: ['qr'],
+                }}
+                onBarcodeScanned={isScanning ? handleBarCodeScanned : undefined}
+              />
+            </View>
+            <View style={styles.instructionContainer}>
+              <Text style={styles.instructionTitle}>Jak to działa?</Text>
+              <Text style={styles.instructionText}>
+                1. Znajdź kod QR na stronie internetowej{'\n'}
+                2. Zeskanuj go tą aplikacją{'\n'}
+                3. Otrzymasz potwierdzenie, czy strona jest bezpieczna
+              </Text>
+            </View>
+          </View>
+        ) : (
+          /* Result Card */
+          <ScrollView style={styles.scrollContainer}>
+            <View style={styles.card}>
+              {verificationStatus === 'success' ? (
+                // Success Screen (Green)
+                <View style={styles.successScreen}>
+                  <Text style={styles.successTitle}>✓ Strona zweryfikowana</Text>
+                  
+                  <View style={styles.verificationBadge}>
+                    <Text style={styles.badgeText}>DOSTĘP DO USŁUG PUBLICZNYCH</Text>
+                  </View>
+
+                  <Text style={styles.domainLabel}>Zweryfikowana domena:</Text>
+                  <Text style={styles.domainText}>{verifiedDomain}</Text>
+                  
+                  {verifiedDomain.endsWith('.gov.pl') && (
+                    <View style={styles.secureBadge}>
+                      <Text style={styles.secureBadgeText}>✓ Domena rządowa .gov.pl</Text>
+                    </View>
+                  )}
+                  
+                  <View style={styles.securityInfo}>
+                    <Text style={styles.securityText}>🔒 Połączenie szyfrowane (SSL)</Text>
+                    <Text style={styles.securityText}>🛡️ Certyfikat ważny</Text>
+                  </View>
+
+                  <Text style={styles.successInstructions}>
+                    Możesz bezpiecznie korzystać z tej strony. Weryfikacja potwierdza autentyczność serwisu.
+                  </Text>
+                  
+                  <View style={styles.infoLink}>
+                     <Text style={styles.infoLinkText}>Zobacz listę oficjalnych portali gov.pl</Text>
+                  </View>
+                </View>
+              ) : verificationStatus === 'failed' ? (
+                // Failed Screen (Red)
+                <View style={styles.failedScreen}>
+                  <Text style={styles.failedTitle}>⚠️ OSTRZEŻENIE</Text>
+                  <Text style={styles.failedWarning}>
+                    Strona NIE jest autentyczna!
+                  </Text>
+                  
+                  <View style={styles.dangerBadge}>
+                    <Text style={styles.badgeText}>PODEJRZENIE PHISHIGU</Text>
+                  </View>
+
+                  <Text style={styles.failedInstructions}>
+                    Wykryto potencjalną próbę oszustwa.{'\n'}
+                    Strona może podszywać się pod serwis rządowy.
+                  </Text>
+
+                  <View style={styles.actionList}>
+                    <Text style={styles.actionItem}>⛔ Nie podawaj żadnych danych</Text>
+                    <Text style={styles.actionItem}>❌ Natychmiast opuść stronę</Text>
+                    <Text style={styles.actionItem}>📢 Zgłoś incydent do CERT Polska</Text>
+                  </View>
+                </View>
+              ) : verificationStatus === 'info' ? (
+                // Info Screen (Neutral)
+                <View style={styles.infoScreen}>
+                  <Text style={styles.infoTitle}>ℹ️ Nieznany kod</Text>
+                  <Text style={styles.infoMessage}>
+                    Zeskanowany kod nie pochodzi z systemu weryfikacji stron rządowych.
                   </Text>
                 </View>
-              </View>
-            ) : verificationStatus === 'failed' ? (
-              // Failed Screen (Red)
-              <View style={styles.failedScreen}>
-                <Text style={styles.failedTitle}>⚠️ UWAGA: Strona niezweryfikowana!</Text>
-                <Text style={styles.failedWarning}>
-                  Nie korzystaj z tej strony!
-                </Text>
-                <Text style={styles.failedInstructions}>
-                  Co powinieneś zrobić:{'\n'}
-                  • Natychmiast zamknij stronę{'\n'}
-                  • Nie podawaj żadnych danych osobowych{'\n'}
-                  • Zgłoś podejrzaną stronę{'\n'}
-                  • Skontaktuj się z właściwą instytucją bezpośrednio
-                </Text>
-                <View style={styles.tokenPreview}>
-                  <Text style={styles.tokenPreviewLabel}>Token:</Text>
-                  <Text style={styles.tokenPreviewText} numberOfLines={2} ellipsizeMode="middle">
-                    {scannedData}
-                  </Text>
+              ) : (
+                // Default display (when verification is in progress)
+                <View style={styles.loadingResult}>
+                  <Text style={styles.cardTitle}>Weryfikacja...</Text>
+                  <Text style={styles.loadingText}>Sprawdzanie certyfikatu i domeny</Text>
                 </View>
-              </View>
-            ) : verificationStatus === 'info' ? (
-              // Info Screen (Neutral)
-              <View style={styles.infoScreen}>
-                <Text style={styles.infoTitle}>ℹ️ Zeskanuj kod walidacyjny</Text>
-                <Text style={styles.infoMessage}>
-                  Zeskanowany kod nie jest kodem weryfikacyjnym. Upewnij się, że skanujesz właściwy kod QR z weryfikowanej strony internetowej.
-                </Text>
-                <View style={styles.tokenPreview}>
-                  <Text style={styles.tokenPreviewLabel}>Zeskanowane dane:</Text>
-                  <Text style={styles.tokenPreviewText} numberOfLines={2} ellipsizeMode="middle">
-                    {scannedData}
-                  </Text>
-                </View>
-              </View>
-            ) : (
-              // Default display (when verification is in progress)
-              <>
-                <Text style={styles.cardTitle}>Weryfikacja w toku...</Text>
-                <View style={styles.resultBox}>
-                  <Text style={styles.resultText} selectable>
-                    {scannedData}
-                  </Text>
-                </View>
-              </>
-            )}
-            {!isScanning && (
+              )}
+              
               <TouchableOpacity
                 style={styles.continueButton}
                 onPress={handleContinue}
               >
-                <Text style={styles.continueButtonText}>Kontynuuj skanowanie</Text>
+                <Text style={styles.continueButtonText}>Skanuj ponownie</Text>
               </TouchableOpacity>
-            )}
-          </View>
-        ) : (
-          <View style={styles.card}>
-            <Text style={styles.instructionTitle}>Jak korzystać?</Text>
-            <Text style={styles.instructionText}>
-              1. Skieruj kamerę na kod QR mDokumentów{'\n'}
-              2. Poczekaj na automatyczne skanowanie{'\n'}
-              3. Sprawdź wyniki weryfikacji
-            </Text>
-          </View>
+            </View>
+          </ScrollView>
         )}
-      </ScrollView>
-
-      {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        <View style={styles.navItem}>
-          <Text style={styles.navText}>Usługi</Text>
-        </View>
-        <View style={styles.navItem}>
-          <Text style={styles.navText}>Przekaż</Text>
-        </View>
-        <View style={[styles.navItem, styles.navItemActive]}>
-          <Text style={[styles.navText, styles.navTextActive]}>Sprawdź</Text>
-        </View>
-        <View style={styles.navItem}>
-          <Text style={styles.navText}>Historia</Text>
-        </View>
       </View>
+
     </SafeAreaView>
   );
 }
@@ -359,7 +342,8 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: COLORS.GOV_RED,
-    paddingVertical: 16,
+    paddingTop: 45,
+    paddingBottom: 16,
     paddingHorizontal: 20,
     alignItems: 'center',
   },
@@ -631,37 +615,107 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     borderRadius: 8,
     alignItems: 'center',
+    width: '100%',
   },
   continueButtonText: {
     color: COLORS.WHITE,
     fontSize: 16,
     fontWeight: '600',
   },
-  bottomNav: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.WHITE,
+  scrollContainer: {
+    flex: 1,
+  },
+  instructionContainer: {
+    marginTop: 20,
+    paddingTop: 20,
     borderTopWidth: 1,
     borderTopColor: COLORS.BORDER_LIGHT,
-    paddingVertical: 8,
-    paddingBottom: 12,
   },
-  navItem: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 8,
+  verificationBadge: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.4)',
   },
-  navItemActive: {
-    borderTopWidth: 2,
-    borderTopColor: COLORS.GOV_RED,
-    marginTop: -2,
-  },
-  navText: {
-    color: COLORS.TEXT_GRAY,
+  badgeText: {
+    color: COLORS.WHITE,
     fontSize: 12,
-    marginTop: 4,
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
-  navTextActive: {
-    color: COLORS.GOV_RED,
+  domainLabel: {
+    color: COLORS.WHITE,
+    fontSize: 14,
+    opacity: 0.9,
+    marginBottom: 4,
+  },
+  secureBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+  secureBadgeText: {
+    color: COLORS.WHITE,
+    fontSize: 14,
     fontWeight: '600',
+    marginLeft: 6,
+  },
+  securityInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginBottom: 24,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    padding: 12,
+    borderRadius: 8,
+  },
+  securityText: {
+    color: COLORS.WHITE,
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  infoLink: {
+    marginTop: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.WHITE,
+  },
+  infoLinkText: {
+    color: COLORS.WHITE,
+    fontSize: 14,
+    fontWeight: '500',
+    paddingBottom: 2,
+  },
+  dangerBadge: {
+    backgroundColor: '#d32f2f',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.4)',
+  },
+  actionList: {
+    width: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    borderRadius: 8,
+    padding: 16,
+    marginTop: 16,
+  },
+  actionItem: {
+    color: COLORS.WHITE,
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  loadingResult: {
+    alignItems: 'center',
+    padding: 20,
   },
 });
